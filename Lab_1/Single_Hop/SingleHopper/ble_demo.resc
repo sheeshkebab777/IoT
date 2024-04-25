@@ -1,0 +1,40 @@
+:name: NRF52840 - BLE Demo
+:description: This script runs a demonstration of Zephyr BLE Advertising and Scanning
+
+using sysbus
+$bin?=@output\firmware.elf
+
+
+emulation CreateBLEMedium "wireless"
+
+# Create 2 Advertiser/Observer
+
+mach create "Node1"
+machine LoadPlatformDescription @platform/nrf52840.repl
+connector Connect sysbus.radio wireless
+
+logLevel -1 sysbus.radio
+showAnalyzer uart0
+
+mach create "Node2"
+machine LoadPlatformDescription @platform/nrf52840.repl
+connector Connect sysbus.radio wireless
+
+logLevel -1 sysbus.radio
+showAnalyzer uart0
+
+emulation SetGlobalQuantum "0.00001"
+emulation LogBLETraffic
+
+macro reset
+"""
+    mach set "Node1"
+    sysbus LoadELF $bin
+
+    mach set "Node2"
+    sysbus LoadELF $bin 
+"""
+runMacro $reset
+
+echo "Script loaded. Now start with the 'start' command."
+echo ""
