@@ -2,7 +2,7 @@
 :description: This script runs a demonstration of Zephyr BLE Advertising and Scanning
 
 using sysbus
-$bin?=@output\firmware.elf
+$bin?=@output/firmware.elf
 
 
 emulation CreateBLEMedium "wireless"

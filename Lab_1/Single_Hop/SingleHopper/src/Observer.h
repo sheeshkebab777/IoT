@@ -3,12 +3,14 @@
 #include <sys/printk.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
+#include <drivers/gpio.h>
 /*______________________________________________________________________*/
 /*_______________________________Observer_______________________________*/
 /*______________________________________________________________________*/
 
 bool LED_ON = false;
-
+static struct gpio_dt_spec led = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios,
+						     {0});
 static bool data_cb(struct bt_data *data, void *user_data)
 {
 	bool *BUTTON_STATUS = user_data;
@@ -30,26 +32,20 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 
 	bt_addr_le_to_str(addr, addr_str, sizeof(addr_str));
 	printk("Received advertisment from: %s",addr_str);
-	return;
-}
-/*Scan receive found*/
-static void scan_recv(const struct bt_le_scan_recv_info *info,
-		      struct net_buf_simple *buf)
-{
+
+	//LED logic
 	bool BUTTON_STATUS;
-	bt_data_parse(buf, data_cb, &BUTTON_STATUS);
+	bt_data_parse(ad, data_cb, &BUTTON_STATUS);
 	if(BUTTON_STATUS){
+		gpio_pin_set_dt(&led,(int)BUTTON_STATUS);
 		LED_ON = true;
 	}
 	else{
+		gpio_pin_set_dt(&led,(int)BUTTON_STATUS);
 		LED_ON = false;
 	}
 	return;
 }
-
-static struct bt_le_scan_cb scan_callbacks = {
-	.recv = scan_recv,
-};
 
 int observer_start()
 {
@@ -61,7 +57,7 @@ int observer_start()
 	};
 	int err;
 
-	bt_le_scan_cb_register(&scan_callbacks);
+	
 	printk("Registered scan callbacks\n");
 
 	err = bt_le_scan_start(&scan_param, device_found);

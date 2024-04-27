@@ -19,22 +19,19 @@ bool SHUTTING_DOWN = false;
 bool BUTTON_PRESSED = false;
 
 /*Adv Data*/
+/* Send status of the LED, Scan Data */
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_NO_BREDR),
-    BT_DATA_BYTES(BT_DATA_NAME_COMPLETE,
-                  'L','E','D')
+    BT_DATA(BT_DATA_MANUFACTURER_DATA,&BUTTON_PRESSED,sizeof(BUTTON_PRESSED))
 };
 
-/* Send status of the LED, Scan Data */
-static const struct bt_data sd[] = {
-	BT_DATA(BT_DATA_MANUFACTURER_DATA,&BUTTON_PRESSED,sizeof(BUTTON_PRESSED)),
-};
+
 int advertiser_start(){
 	/*Update data*/
-	bt_le_adv_update_data(NULL, 0, sd, ARRAY_SIZE(sd));
+	bt_le_adv_update_data(ad, ARRAY_SIZE(ad), NULL, 0);
 	/* Start advertising */
-	int err = bt_le_adv_start(BT_LE_ADV_NCONN_IDENTITY, ad, ARRAY_SIZE(ad),
-			      sd, ARRAY_SIZE(sd));
+	int err  = bt_le_adv_start(BT_LE_ADV_NCONN,
+					ad, ARRAY_SIZE(ad), NULL, 0);
 	if (err) {
 		printk("Advertising failed to start (err %d)\n", err);
 		
