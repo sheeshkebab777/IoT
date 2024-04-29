@@ -6,7 +6,6 @@
 //MSECS
 #define ADV_INTERVAL_MIN    500    
 #define ADV_INTERVAL_MAX    700 
-
 /*___________________________________________________________________*/
 /*_______________________________Other_______________________________*/
 /*___________________________________________________________________*/
@@ -64,7 +63,7 @@ int main(void)
 
 	uint32_t rand = ADV_INTERVAL_MIN + sys_rand32_get()%(ADV_INTERVAL_MAX - ADV_INTERVAL_MIN);
 	k_timer_init(&timer, timer_callback, NULL);
-	k_timer_start(&timer, K_MSEC(rand), K_MSEC(rand));
+	k_timer_start(&timer, K_MSEC(rand), K_MSEC(300));
 	printk("Started timer with %d MSECS\n",rand);
 
 	while(1){
