@@ -28,7 +28,7 @@ def lat_rel(dic,macs):
     for val in delete_vals:
         send.remove(val)
     
-    latency_values = [(y-x) for ((x,_),(y,_)) in zip(send,recv)]
+    latency_values = [abs(y-x) for ((x,_),(y,_)) in zip(send,recv)]
     
     
     return reliability, latency_values
@@ -70,21 +70,19 @@ plt.legend()
 
 # Show plot
 plt.show()
-
+'''
 #########################################
 
 categories = ['Dir_1', 'Dir_2']
-values = [rel1,rel2]
+values = [rel1*100,rel2*100]
 
-# Create bar plot
-plt.bar(categories, values)
 
-# Add labels and title
-plt.xlabel('Directions')
-plt.ylabel('Reliability in %')
-plt.title('Reliability')
+fig, ax = plt.subplots()
+x_labels = categories
+ax.bar(x_labels, values, color='blue')
+ax.set_ylabel('Reliability in %')
+ax.set_xlabel('Directions')
+ax.set_title('Reliability')
+ax.set_ylim(ymin=0, ymax=100)
+plt.show(block=False)
 
-# Show plot
-plt.show()
-
-'''

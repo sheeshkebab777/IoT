@@ -1,11 +1,10 @@
 #include <random/rand32.h>
 #include <kernel.h>
 #include "Advertiser.h"
-#include "Observer.h"
 
 //MSECS
 #define ADV_INTERVAL_MIN    500    
-#define ADV_INTERVAL_MAX    900 
+#define ADV_INTERVAL_MAX    700 
 /*___________________________________________________________________*/
 /*_______________________________Other_______________________________*/
 /*___________________________________________________________________*/
@@ -22,33 +21,6 @@ void timer_callback(struct k_timer *timer) {
     k_work_submit(&stop_ble_work);
 }
 
-static void bt_ready(int err)
-{
-	
-	bt_addr_le_t addr = {0};
-	size_t count = 1;
-	bt_id_get(&addr,&count);
-
-	if (err) {
-		printk("Bluetooth init failed (err %d)\n", err);
-		return;
-	}
-
-	printk("Bluetooth initialized\n");
-	bt_addr_le_to_str(&addr, addr_s, sizeof(addr_s));
-	
-	err = observer_start();
-	if(err){
-		return;
-	}
-
-
-	printk("Observing as %s\n", addr_s);
-
-}
-uint32_t get_random(){
-	return ADV_INTERVAL_MIN + sys_rand32_get()%(ADV_INTERVAL_MAX - ADV_INTERVAL_MIN);
-}
 
 struct k_timer timer;
 
@@ -59,13 +31,17 @@ int main(void)
 	printk("Starting ...\n");
 
 	/* Initialize the Bluetooth Subsystem*/
-	err = bt_enable(bt_ready);
-	if (err) { return 0;}
+	err = bt_enable(NULL);
+	if (err) {
+		printk("Bluetooth init failed (err %d)\n", err);
+		return 0;
+	}
+	printk("Bluetooth initialized\n");
 
 	/*advertising random timer through a workqueue thread*/
 	k_work_init(&stop_ble_work, stop_ble_handler);
 
-	uint32_t rand = get_random();
+	uint32_t rand = ADV_INTERVAL_MIN + sys_rand32_get()%(ADV_INTERVAL_MAX - ADV_INTERVAL_MIN);
 	k_timer_init(&timer, timer_callback, NULL);
 	k_timer_start(&timer, K_MSEC(rand), K_MSEC(500));
 	printk("Started timer with %d MSECS\n",rand);

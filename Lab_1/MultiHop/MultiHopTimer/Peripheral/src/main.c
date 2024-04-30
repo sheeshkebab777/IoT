@@ -6,6 +6,7 @@
 //MSECS
 #define ADV_INTERVAL_MIN    500    
 #define ADV_INTERVAL_MAX    900 
+
 /*___________________________________________________________________*/
 /*_______________________________Other_______________________________*/
 /*___________________________________________________________________*/
@@ -14,7 +15,7 @@ char addr_s[BT_ADDR_LE_STR_LEN];
 
 void stop_ble_handler(struct k_work *work) {
     // Call stop_ble() here
-    advertiser_restart(addr_s);
+    advertiser_stop();
 }
 
 void timer_callback(struct k_timer *timer) {
@@ -46,9 +47,6 @@ static void bt_ready(int err)
 	printk("Observing as %s\n", addr_s);
 
 }
-uint32_t get_random(){
-	return ADV_INTERVAL_MIN + sys_rand32_get()%(ADV_INTERVAL_MAX - ADV_INTERVAL_MIN);
-}
 
 struct k_timer timer;
 
@@ -61,14 +59,10 @@ int main(void)
 	/* Initialize the Bluetooth Subsystem*/
 	err = bt_enable(bt_ready);
 	if (err) { return 0;}
-
 	/*advertising random timer through a workqueue thread*/
 	k_work_init(&stop_ble_work, stop_ble_handler);
-
-	uint32_t rand = get_random();
-	k_timer_init(&timer, timer_callback, NULL);
-	k_timer_start(&timer, K_MSEC(rand), K_MSEC(500));
-	printk("Started timer with %d MSECS\n",rand);
+	//uint32_t rand = ADV_INTERVAL_MIN + sys_rand32_get()%(ADV_INTERVAL_MAX - ADV_INTERVAL_MIN);
+	k_timer_init(&adv_timer, timer_callback, NULL);
 
 	while(1){
 		k_sleep(K_FOREVER);

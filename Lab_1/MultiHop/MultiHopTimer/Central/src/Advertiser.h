@@ -13,6 +13,7 @@
 
 //#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
+#define DURATION 3
 int counter = 0;
 /*Adv Data*/
 /* Send status of the LED Data */
@@ -39,7 +40,7 @@ void advertiser_restart(char * addr_s){
 		return;
 	}
 	uint32_t time_ms = (((sys_clock_cycle_get_32())*1000)/32768);
-	printk("%d: %s Sending Counter: %d\n",time_ms,addr_s,counter);
+	printk("%d: Sending Counter: %d\n",time_ms,counter);
 	
 }
 
