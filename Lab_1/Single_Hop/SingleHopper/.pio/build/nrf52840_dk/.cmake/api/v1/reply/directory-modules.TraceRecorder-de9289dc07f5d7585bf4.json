@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "modules/TraceRecorder",
+		"source" : "/home/berlad/.platformio/packages/framework-zephyr/modules/TraceRecorder"
+	}
+}

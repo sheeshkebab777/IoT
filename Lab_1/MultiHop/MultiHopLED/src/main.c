@@ -80,13 +80,14 @@ static void bt_ready(int err)
 {
 	char addr_s[BT_ADDR_LE_STR_LEN];
 	bt_addr_le_t addr = {0};
-
+	size_t count = 1;
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
 		return;
 	}
 
 	printk("Bluetooth initialized\n");
+	bt_id_get(&addr,&count);
 	bt_addr_le_to_str(&addr, addr_s, sizeof(addr_s));
 
 	err = observer_start();
@@ -105,7 +106,6 @@ bool first_button_press = true;
 int main(void)
 {
 	int err;
-
 	printk("Starting ...\n");
 
 	/* Initialize the Bluetooth Subsystem*/
@@ -116,7 +116,7 @@ int main(void)
 	
 	k_work_init(&work,stop_ble_handler);
 	k_timer_init(&timer,timer_callback,NULL);
-	
+	gpio_pin_set_dt(&led,0);
 	
 	/*advertising, scanning loop*/
 	if(led.port){
@@ -149,8 +149,9 @@ int main(void)
 					advertiser_restart();
 
 				}
-				k_sleep(K_SECONDS(1));
+				
 			}
+			k_sleep(K_SECONDS(1));
 			
 	}
 	}

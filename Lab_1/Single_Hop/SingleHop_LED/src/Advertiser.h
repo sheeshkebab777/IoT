@@ -22,7 +22,8 @@ bool BUTTON_PRESSED = false;
 /* Send status of the LED Data */
 static struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_NO_BREDR),
-    BT_DATA(BT_DATA_MANUFACTURER_DATA,&BUTTON_PRESSED,sizeof(BUTTON_PRESSED))
+    BT_DATA(BT_DATA_MANUFACTURER_DATA,&BUTTON_PRESSED,sizeof(BUTTON_PRESSED)),
+
 };
 
 

@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "modules/mipi-sys-t",
+		"source" : "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/debug/mipi-sys-t"
+	}
+}

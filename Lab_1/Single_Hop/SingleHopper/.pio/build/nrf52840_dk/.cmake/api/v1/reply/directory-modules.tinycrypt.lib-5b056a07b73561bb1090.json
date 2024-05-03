@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "modules/tinycrypt/lib",
+		"source" : "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/crypto/tinycrypt/lib"
+	}
+}

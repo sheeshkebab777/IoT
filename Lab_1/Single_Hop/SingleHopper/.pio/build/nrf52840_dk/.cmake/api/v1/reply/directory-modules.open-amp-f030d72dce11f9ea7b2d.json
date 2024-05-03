@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "modules/open-amp",
+		"source" : "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/lib/open-amp"
+	}
+}
