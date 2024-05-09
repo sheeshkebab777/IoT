@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "zephyr.h": "c",
+        "types.h": "c",
+        "advertiser.h": "c",
+        "hci.h": "c",
+        "printk.h": "c",
+        "bluetooth.h": "c",
+        "rand32.h": "c",
+        "gpio.h": "c"
+    }
+}

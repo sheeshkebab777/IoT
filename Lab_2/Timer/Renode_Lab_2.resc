@@ -1,0 +1,139 @@
+:name: nRF52840 BLE on Zephyr
+
+# This script contains the configurations for lab 1.
+# For the industrial communication challenge uncomment lines ...
+
+# The `using` command allows the user to omit a prefix when referring to a peripheral.
+# Here `using sysbus` allows to refer to `uart0` instead of `sysbus.uart0` and to `radio` instead of `sysbus.radio`. 
+using sysbus
+
+# Lines below declare binary file for Zephyr BLE devices.
+# Binaries used here are defaults and can be replaced by changing variables below before running this script.
+$central?=@output/central.elf                            # update path here!
+$peripheral?=@output/peripheral.elf                         # comment in and update path if you use a separate sink firmware!
+# $firmware_interferer_bin=@firmware_interferer.elf     # update path here!
+# $sink_interferer_bin?=@sink_interferer_firmware.elf   # comment in and update path if you use a separate sink firmware!
+
+
+# Declare location of our modified nRF52840 platform (with random BLE address).
+$board?=@platform/nrf52840.repl                        # set path here
+
+# Create a wireless medium for communication.
+emulation CreateBLEMedium "wireless"
+
+# Choose the wireless fuction
+#wireless SetRangeWirelessFunction 11                    # no signal exceeding range of 11 units
+wireless SetRangeLossWirelessFunction 10 1.0 0.6      # linear fuction with no signal at a range exceeding 25 units
+
+# Create socket terminals to access the UART of each device through TCP
+emulation CreateServerSocketTerminal 60001 "term_1"              # access output with e.g. `telnet localhost 60001`, exit telnet with Ctrl+], then type quit
+emulation CreateServerSocketTerminal 60002 "term_2"              # access output with e.g. `telnet localhost 60002`
+emulation CreateServerSocketTerminal 60003 "term_3"              # access output with e.g. `telnet localhost 60003`
+emulation CreateServerSocketTerminal 60004 "term_4"              # access output with e.g. `telnet localhost 60004`
+
+# Comment in lines below for evaluating two versions of your program in parallel
+# emulation CreateServerSocketTerminal 60005 "term_5"            # access output with e.g. `telnet localhost 60005`
+# emulation CreateServerSocketTerminal 60006 "term_6"            # access output with e.g. `telnet localhost 60006`
+# emulation CreateServerSocketTerminal 60007 "term_7"            # access output with e.g. `telnet localhost 60007`
+# emulation CreateServerSocketTerminal 60008 "term_8"            # access output with e.g. `telnet localhost 60008`
+
+
+# Create up to four machines named "device_1" till "device_4" based on the our modified nRF52840 platform (with random BLE address).
+# Connect the machine to our wireless medium, set its position, and connect its UART to the TCP socket.
+mach create "device_1"
+machine LoadPlatformDescription $board
+connector Connect radio wireless
+wireless SetPosition radio 0 0 0
+connector Connect uart0 term_1
+showAnalyzer uart0                                    # optionally show the UART output also as a seperate window
+
+mach create "device_2"
+machine LoadPlatformDescription $board
+connector Connect radio wireless
+wireless SetPosition radio 0 10 0
+connector Connect uart0 term_2
+showAnalyzer uart0
+
+mach create "device_3"
+machine LoadPlatformDescription $board
+connector Connect radio wireless
+wireless SetPosition radio 0 20 0
+connector Connect uart0 term_3
+showAnalyzer uart0
+
+mach create "device_4"
+machine LoadPlatformDescription $board
+connector Connect radio wireless
+wireless SetPosition radio 0 30 0
+connector Connect uart0 term_4
+showAnalyzer uart0
+
+
+# Comment in machines below for evaluating two versions of your program in parallel
+# Create four machines named "interferer_1" till "interferer_4" based on the our modified nRF52840 platform (with random BLE address).
+# Connect the machine to our wireless medium and set its position.
+
+# mach create "interferer_1"                            # uncomment for second part of the evaluation of the industrial communication challenge
+# machine LoadPlatformDescription $board
+# connector Connect radio wireless
+# wireless SetPosition radio 10 0 0
+# # showAnalyzer uart0
+
+# mach create "interferer_2"                            # uncomment for second part of the evaluation of the industrial communication challenge
+# machine LoadPlatformDescription $board
+# connector Connect radio wireless
+# wireless SetPosition radio 10 10 0
+# # showAnalyzer uart0
+
+# mach create "interferer_3"                            # uncomment for second part of the evaluation of the industrial communication challenge
+# machine LoadPlatformDescription $board
+# connector Connect radio wireless
+# wireless SetPosition radio 10 20 0
+# # showAnalyzer uart0
+
+# mach create "interferer_4"                            # uncomment for second part of the evaluation of the industrial communication challenge
+# machine LoadPlatformDescription $board
+# connector Connect radio wireless
+# wireless SetPosition radio 10 30 0
+# # showAnalyzer uart0
+
+
+# Set Quantum value for CPUs. This is required by BLE stack.
+# Moreover, it allows better synchronisation between machines.
+emulation SetGlobalQuantum "0.00001"
+
+# Start Wireshark to see the BLE traffic
+#emulation LogBLETraffic
+
+# The following series of commands is executed everytime the machine is reset.
+macro reset
+"""
+    mach set "device_1"
+    sysbus LoadELF $central
+
+    mach set "device_2"
+    sysbus LoadELF $peripheral
+
+    mach set "device_3"
+    sysbus LoadELF $peripheral
+
+    mach set "device_4"
+    sysbus LoadELF $peripheral
+
+# Comment in machines below for evaluating two versions of your program in parallel
+#     mach set "interferer_1"                           # uncomment for second part of the evaluation of the industrial communication challenge
+#     sysbus LoadELF $firmware_interferer_bin
+
+#     mach set "interferer_2"                           # uncomment for second part of the evaluation of the industrial communication challenge
+#     sysbus LoadELF $firmware_interferer_bin
+
+#     mach set "interferer_3"                           # uncomment for second part of the evaluation of the industrial communication challenge
+#     sysbus LoadELF $firmware_interferer_bin
+
+#     mach set "interferer_4"                           # uncomment for second part of the evaluation of the industrial communication challenge
+#     sysbus LoadELF $firmware_interferer_bin
+"""
+runMacro $reset
+
+echo "Script loaded. Now start with with the 'start' or 's' command."
+echo ""
