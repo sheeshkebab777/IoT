@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "modules/sof",
+		"source" : "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/audio/sof/zephyr"
+	}
+}

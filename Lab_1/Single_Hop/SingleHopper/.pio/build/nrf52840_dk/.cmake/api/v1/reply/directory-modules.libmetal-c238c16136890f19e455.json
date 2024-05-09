@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "modules/libmetal",
+		"source" : "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/libmetal"
+	}
+}

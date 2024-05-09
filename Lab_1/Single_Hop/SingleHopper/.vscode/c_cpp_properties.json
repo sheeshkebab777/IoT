@@ -1,0 +1,83 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/home/berlad/Uni/6.Semester/IoT/IoT/Lab_1/Single_Hop/SingleHopper/include",
+                "/home/berlad/Uni/6.Semester/IoT/IoT/Lab_1/Single_Hop/SingleHopper/src",
+                "/home/berlad/.platformio/packages/framework-zephyr/include",
+                "/home/berlad/Uni/6.Semester/IoT/IoT/Lab_1/Single_Hop/SingleHopper/.pio/build/nrf52840_dk/zephyr/include/generated",
+                "/home/berlad/.platformio/packages/framework-zephyr/soc/arm/nordic_nrf/nrf52",
+                "/home/berlad/.platformio/packages/framework-zephyr/subsys/bluetooth",
+                "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/cmsis/CMSIS/Core/Include",
+                "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/nordic/nrfx",
+                "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/nordic/nrfx/drivers/include",
+                "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/nordic/nrfx/mdk",
+                "/home/berlad/.platformio/packages/framework-zephyr/modules/hal_nordic/nrfx",
+                "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/debug/segger/SEGGER",
+                "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/debug/segger/Config",
+                "/home/berlad/.platformio/packages/framework-zephyr/modules/segger",
+                "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/crypto/tinycrypt/lib/include",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/berlad/Uni/6.Semester/IoT/IoT/Lab_1/Single_Hop/SingleHopper/include",
+                    "/home/berlad/Uni/6.Semester/IoT/IoT/Lab_1/Single_Hop/SingleHopper/src",
+                    "/home/berlad/.platformio/packages/framework-zephyr/include",
+                    "/home/berlad/Uni/6.Semester/IoT/IoT/Lab_1/Single_Hop/SingleHopper/.pio/build/nrf52840_dk/zephyr/include/generated",
+                    "/home/berlad/.platformio/packages/framework-zephyr/soc/arm/nordic_nrf/nrf52",
+                    "/home/berlad/.platformio/packages/framework-zephyr/subsys/bluetooth",
+                    "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/cmsis/CMSIS/Core/Include",
+                    "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/nordic/nrfx",
+                    "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/nordic/nrfx/drivers/include",
+                    "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/hal/nordic/nrfx/mdk",
+                    "/home/berlad/.platformio/packages/framework-zephyr/modules/hal_nordic/nrfx",
+                    "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/debug/segger/SEGGER",
+                    "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/debug/segger/Config",
+                    "/home/berlad/.platformio/packages/framework-zephyr/modules/segger",
+                    "/home/berlad/.platformio/packages/framework-zephyr/_pio/modules/crypto/tinycrypt/lib/include",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60115",
+                "ARDUINO_NRF52_DK",
+                "BUILD_VERSION=zephyr-v20701",
+                "KERNEL",
+                "NRF52840_XXAA",
+                "_FORTIFY_SOURCE=2",
+                "__PROGRAM_START",
+                "__ZEPHYR__=1",
+                ""
+            ],
+            "cStandard": "c99",
+            "forcedInclude": [
+                "/home/berlad/Uni/6.Semester/IoT/IoT/Lab_1/Single_Hop/SingleHopper/.pio/build/nrf52840_dk/zephyr/include/generated/autoconf.h",
+                "/home/berlad/.platformio/packages/framework-zephyr/include/toolchain/zephyr_stdint.h",
+                ""
+            ],
+            "compilerPath": "/home/berlad/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-gcc",
+            "compilerArgs": [
+                "-mcpu=cortex-m4",
+                "-mthumb",
+                "-mabi=aapcs",
+                "-mfp16-format=ieee",
+                "-isystem",
+                "/home/berlad/.platformio/packages/framework-zephyr/lib/libc/minimal/include",
+                "-isystem",
+                "/home/berlad/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/8.2.1/include",
+                "-isystem",
+                "/home/berlad/.platformio/packages/toolchain-gccarmnoneeabi/bin/../lib/gcc/arm-none-eabi/8.2.1/include-fixed",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

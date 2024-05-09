@@ -19,6 +19,9 @@ bool SHUTTING_DOWN = false;
 bool BUTTON_PRESSED = false;
 /*tells if the node is currently advertising*/
 bool advertising = false;
+
+
+
 /*Adv Data*/
 /* Send status of the LED Data */
 static struct bt_data ad[] = {

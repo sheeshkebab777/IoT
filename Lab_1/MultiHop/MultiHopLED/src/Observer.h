@@ -20,6 +20,7 @@ static bool data_cb(struct bt_data *data, void *user_data)
 	switch (data->type) {
 	case BT_DATA_MANUFACTURER_DATA:
 		memcpy(BUTTON_STATUS,data->data,sizeof(bool));
+		sink_node=false;
 		return false;
 	default:
 		return true;
@@ -34,17 +35,20 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 	if(advertising){return;}
 	char addr_str[BT_ADDR_LE_STR_LEN];
 	
-	sink_node = false;
 
 	bt_addr_le_to_str(addr, addr_str, sizeof(addr_str));
 	//printk("Received advertisment from: %s\n",addr_str);
+	sink_node = false;
 
 	//LED logic
-	bool BUTTON_STATUS;
+	int BUTTON_STATUS;
 	bt_data_parse(ad, data_cb, &BUTTON_STATUS);
-	
+	//value 0 or 1
+
 	gpio_pin_set_dt(&led,(int)BUTTON_STATUS);
+	
 	printk("LED status: %d\n",BUTTON_STATUS);
+	printk("Address %s\n",addr_str);
 	BUTTON_PRESSED = BUTTON_STATUS;
 	/*advertise update to nearby nodes*/
 	advertiser_restart();
