@@ -9,6 +9,30 @@
 /*___________________________________________________________________*/
 /*_______________________________Main________________________________*/
 /*___________________________________________________________________*/
+
+
+struct k_timer network_form_timer;
+struct k_work network_form_worker;
+
+void network_form_handler(){
+	if(nodeCount == 3){
+		//k_timer_start(&network_form_timer,K_FOREVER,K_FOREVER);
+		k_timer_stop(&network_form_timer);
+		packet.type = FLAG_NETWORK_START_SEND;
+		ADV_DURATION = 1000;
+		printk("Start sending\n");
+		advertiser_restart();
+		return;
+	}
+	printk("Sending out formation\n");
+	advertiser_restart();
+
+}
+
+void network_form_callback(){
+	k_work_submit(&network_form_worker);
+}
+
 struct k_work init_worker;
 struct k_timer init_timer;
 
@@ -16,7 +40,7 @@ void init_handler(struct k_work *work) {
     printk("Sink node\n");
 	
 	SINK_NODE = YES_SINK_NODE;
-	advertiser_restart();
+	k_timer_start(&network_form_timer, K_NO_WAIT, K_MSEC(700));
 }
 
 void init_callback(struct k_timer *timer) {
@@ -64,6 +88,10 @@ int main(void)
 
 	k_work_init(&work,stop_ble_handler);
 	k_timer_init(&timer,timer_callback,NULL);
+	
+	/*init network form timer*/
+	k_work_init(&network_form_worker,network_form_handler);
+	k_timer_init(&network_form_timer,network_form_callback,NULL);
 	
 	/*start*/
 	k_work_init(&init_worker,init_handler);

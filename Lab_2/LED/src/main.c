@@ -16,26 +16,39 @@
 
 static void bt_ready(int err)
 {
-	char addr_s[BT_ADDR_LE_STR_LEN];
-	bt_addr_le_t addr = {0};
-
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
 		return;
 	}
 
 	printk("Bluetooth initialized\n");
-	bt_addr_le_to_str(&addr, addr_s, sizeof(addr_s));
 
 	err = observer_start();
 	if(err){
 		return;
 	}
 
-
-	printk("Observing as %s\n", addr_s);
 	
 
+}
+
+struct k_timer network_form_timer;
+struct k_work network_form_worker;
+
+void network_form_handler(){
+	if(nodeCount == 3){
+		//k_timer_start(&network_form_timer,K_FOREVER,K_FOREVER);
+		k_timer_stop(&network_form_timer);
+		packet.type = FLAG_NETWORK_START_SEND;
+		advertiser_restart();
+		return;
+	}
+	advertiser_restart();
+
+}
+
+void network_form_callback(){
+	k_work_submit(&network_form_worker);
 }
 
 int main(void)
@@ -57,6 +70,8 @@ int main(void)
 	k_work_init(&work,stop_ble_handler);
 	k_timer_init(&timer,timer_callback,NULL);
 	
+	k_work_init(&network_form_worker,network_form_handler);
+	k_timer_init(&network_form_timer,network_form_callback,NULL);
 	/*start*/
 	
 	/*advertising, scanning loop*/
@@ -66,7 +81,11 @@ int main(void)
 		if (BUTTON_PRESSED && (SINK_NODE==SINK_NODE_NOT_KNOWN)){
 			printk("Sink node\n");
 			SINK_NODE = YES_SINK_NODE;
-			advertiser_restart();
+
+			k_timer_start(&network_form_timer, K_NO_WAIT, K_MSEC(700));
+
+			k_sleep(K_FOREVER);
+			
 		}
 		k_sleep(K_SECONDS(1));
 			

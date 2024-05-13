@@ -19,7 +19,7 @@
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
-#define ADV_DURATION 200
+uint16_t ADV_DURATION = 150;
 
 
 
@@ -46,11 +46,12 @@ void init_packet(){
 		.password = password,
 		.type = FLAG_NETWORK_FORM,
 		.nodeID = sys_rand32_get()%(UINT16_MAX - 1) + 1,
-		.rootNodeID = 0,
+		.recvNodeID = 0,
 		.counter = 0,
 		.temp = 0,
 		.humidity = 0,
-		.timestamp = 0
+		.timestamp = 0,
+		.nodeCount = 3
 	};	
 	printk("Initialized with ID:%d\n",packet.nodeID);
 }

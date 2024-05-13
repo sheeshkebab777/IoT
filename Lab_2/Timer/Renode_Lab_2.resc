@@ -22,8 +22,8 @@ $board?=@platform/nrf52840.repl                        # set path here
 emulation CreateBLEMedium "wireless"
 
 # Choose the wireless fuction
-#wireless SetRangeWirelessFunction 11                    # no signal exceeding range of 11 units
-wireless SetRangeLossWirelessFunction 10 1.0 0.6      # linear fuction with no signal at a range exceeding 25 units
+wireless SetRangeWirelessFunction 11                    # no signal exceeding range of 11 units
+#wireless SetRangeLossWirelessFunction 10 1.0 0.6      # linear fuction with no signal at a range exceeding 25 units
 
 # Create socket terminals to access the UART of each device through TCP
 emulation CreateServerSocketTerminal 60001 "term_1"              # access output with e.g. `telnet localhost 60001`, exit telnet with Ctrl+], then type quit

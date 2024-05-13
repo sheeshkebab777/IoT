@@ -45,13 +45,15 @@ void init_packet(){
 	packet = (struct packet){
 		.password = password,
 		.type = FLAG_NETWORK_FORM,
-		.nodeID = sys_rand32_get()%(UINT32_MAX - 1) + 1,
-		.rootNodeID = 0,
+		.nodeID = sys_rand32_get()%(UINT16_MAX - 1) + 1,
+		.recvNodeID = 0,
 		.counter = 0,
 		.temp = 0,
 		.humidity = 0,
-		.timestamp = 0
+		.timestamp = 0,
+		.nodeCount = 3
 	};	
+	printk("Initialized with ID:%d\n",packet.nodeID);
 }
 
 void reset_packet(){
@@ -108,6 +110,7 @@ int advertiser_restart(){
 
 void start_sending(){
 	reset_packet();
+	printk("Sending own...\n");
 	advertiser_restart();
 }
 
