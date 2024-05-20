@@ -11,8 +11,8 @@ using sysbus
 # Binaries used here are defaults and can be replaced by changing variables below before running this script.
 $central?=@output/central.elf                            # update path here!
 $peripheral?=@output/peripheral.elf                         # comment in and update path if you use a separate sink firmware!
-# $firmware_interferer_bin=@firmware_interferer.elf     # update path here!
-# $sink_interferer_bin?=@sink_interferer_firmware.elf   # comment in and update path if you use a separate sink firmware!
+$firmware_interferer_bin=@output/firmware_interferer.elf     # update path here!
+$sink_interferer_bin?=@output/sink_interferer_firmware.elf   # comment in and update path if you use a separate sink firmware!
 
 
 # Declare location of our modified nRF52840 platform (with random BLE address).
@@ -32,10 +32,10 @@ emulation CreateServerSocketTerminal 60003 "term_3"              # access output
 emulation CreateServerSocketTerminal 60004 "term_4"              # access output with e.g. `telnet localhost 60004`
 
 # Comment in lines below for evaluating two versions of your program in parallel
-# emulation CreateServerSocketTerminal 60005 "term_5"            # access output with e.g. `telnet localhost 60005`
-# emulation CreateServerSocketTerminal 60006 "term_6"            # access output with e.g. `telnet localhost 60006`
-# emulation CreateServerSocketTerminal 60007 "term_7"            # access output with e.g. `telnet localhost 60007`
-# emulation CreateServerSocketTerminal 60008 "term_8"            # access output with e.g. `telnet localhost 60008`
+#emulation CreateServerSocketTerminal 60005 "term_5"            # access output with e.g. `telnet localhost 60005`
+#emulation CreateServerSocketTerminal 60006 "term_6"            # access output with e.g. `telnet localhost 60006`
+#emulation CreateServerSocketTerminal 60007 "term_7"            # access output with e.g. `telnet localhost 60007`
+#emulation CreateServerSocketTerminal 60008 "term_8"            # access output with e.g. `telnet localhost 60008`
 
 
 # Create up to four machines named "device_1" till "device_4" based on the our modified nRF52840 platform (with random BLE address).
@@ -73,29 +73,30 @@ showAnalyzer uart0
 # Create four machines named "interferer_1" till "interferer_4" based on the our modified nRF52840 platform (with random BLE address).
 # Connect the machine to our wireless medium and set its position.
 
-# mach create "interferer_1"                            # uncomment for second part of the evaluation of the industrial communication challenge
-# machine LoadPlatformDescription $board
-# connector Connect radio wireless
-# wireless SetPosition radio 10 0 0
-# # showAnalyzer uart0
+#mach create "interferer_1"                            # uncomment for second part of the evaluation of the industrial communication challenge
+#machine LoadPlatformDescription $board
+#connector Connect radio wireless
+#wireless SetPosition radio 10 0 0
+#connector Connect uart0 term_5
+#showAnalyzer uart0
 
-# mach create "interferer_2"                            # uncomment for second part of the evaluation of the industrial communication challenge
-# machine LoadPlatformDescription $board
-# connector Connect radio wireless
-# wireless SetPosition radio 10 10 0
-# # showAnalyzer uart0
+#mach create "interferer_2"                            # uncomment for second part of the evaluation of the industrial communication challenge
+#machine LoadPlatformDescription $board
+#connector Connect radio wireless
+#wireless SetPosition radio 10 10 0
+#showAnalyzer uart0
 
-# mach create "interferer_3"                            # uncomment for second part of the evaluation of the industrial communication challenge
-# machine LoadPlatformDescription $board
-# connector Connect radio wireless
-# wireless SetPosition radio 10 20 0
-# # showAnalyzer uart0
+#mach create "interferer_3"                            # uncomment for second part of the evaluation of the industrial communication challenge
+#machine LoadPlatformDescription $board
+#connector Connect radio wireless
+#wireless SetPosition radio 10 20 0
+#showAnalyzer uart0
 
-# mach create "interferer_4"                            # uncomment for second part of the evaluation of the industrial communication challenge
-# machine LoadPlatformDescription $board
-# connector Connect radio wireless
-# wireless SetPosition radio 10 30 0
-# # showAnalyzer uart0
+#mach create "interferer_4"                            # uncomment for second part of the evaluation of the industrial communication challenge
+#machine LoadPlatformDescription $board
+#connector Connect radio wireless
+#wireless SetPosition radio 10 30 0
+#showAnalyzer uart0
 
 
 # Set Quantum value for CPUs. This is required by BLE stack.
@@ -121,17 +122,17 @@ macro reset
     sysbus LoadELF $peripheral
 
 # Comment in machines below for evaluating two versions of your program in parallel
-#     mach set "interferer_1"                           # uncomment for second part of the evaluation of the industrial communication challenge
-#     sysbus LoadELF $firmware_interferer_bin
+ #    mach set "interferer_1"                           # uncomment for second part of the evaluation of the industrial communication challenge
+ #    sysbus LoadELF $sink_interferer_bin
 
-#     mach set "interferer_2"                           # uncomment for second part of the evaluation of the industrial communication challenge
-#     sysbus LoadELF $firmware_interferer_bin
+ #    mach set "interferer_2"                           # uncomment for second part of the evaluation of the industrial communication challenge
+ #    sysbus LoadELF $firmware_interferer_bin
 
-#     mach set "interferer_3"                           # uncomment for second part of the evaluation of the industrial communication challenge
-#     sysbus LoadELF $firmware_interferer_bin
-
-#     mach set "interferer_4"                           # uncomment for second part of the evaluation of the industrial communication challenge
-#     sysbus LoadELF $firmware_interferer_bin
+  #   mach set "interferer_3"                           # uncomment for second part of the evaluation of the industrial communication challenge
+  #   sysbus LoadELF $firmware_interferer_bin
+#
+   #  mach set "interferer_4"                           # uncomment for second part of the evaluation of the industrial communication challenge
+   #  sysbus LoadELF $firmware_interferer_bin
 """
 runMacro $reset
 

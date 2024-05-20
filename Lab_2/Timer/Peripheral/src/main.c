@@ -41,6 +41,7 @@ int main(void)
 
 	printk("Starting ...\n");
 
+	
 	/* Initialize the Bluetooth Subsystem*/
 	err = bt_enable(bt_ready);
 	if (err) { return 0;}
@@ -52,8 +53,8 @@ int main(void)
 	k_work_init(&work,stop_ble_handler);
 	k_timer_init(&timer,timer_callback,NULL);
 	
-	/*start*/
 	
+
 	/*advertising, scanning loop*/
 	while(1){
 		k_sleep(K_FOREVER);

@@ -12,11 +12,7 @@
 /*______________________________________________________________________*/
 /*_______________________________Observer_______________________________*/
 /*______________________________________________________________________*/
-#define SINK_NODE_NOT_KNOWN -1
-#define NO_SINK_NODE 0
-#define YES_SINK_NODE 1
 
-int8_t SINK_NODE = SINK_NODE_NOT_KNOWN;
 bool own_turn = true;
 
 struct k_work start_send_worker;
@@ -32,7 +28,7 @@ void wait_for_advertiser(){
 /*Start advertising temp values*/
 void start_sending_handler(struct k_work *work) {
     // Call stop_ble() here
-	if (!own_turn && packet.nodeID != 0) return;
+	//if (!own_turn && packet.nodeID != 0) return;
     start_sending();
 	own_turn = false;
 }
@@ -91,19 +87,7 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 		
 		if(pack.type == FLAG_NETWORK_START_SEND){
 			
-			if(packet.recvNodeID == 0){
-				packet.recvNodeID = pack.nodeID;
-				packet.nodeID = pack.nodeID - 1;
-				printk("Node formed with root node ID: %d\n",packet.recvNodeID);
-				printk("Initialized with ID:%d\n",packet.nodeID);
-			}
-			else{
-				return;
-			}
-
-			packet.type = FLAG_NETWORK_START_SEND;
-
-			if(packet.nodeID > 0){
+			if(packet.nodeID < 4){
 				//advertise for longer
 				uint16_t last_dur = ADV_DURATION;
 				ADV_DURATION = 1000;
@@ -123,7 +107,6 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 			k_work_init(&start_send_worker, start_sending_handler);
 
 			uint32_t rand = 500 + sys_rand32_get()%(500);
-			//printk("Start timer: %d\n",rand);
 			k_timer_init(&start_send_timer, callback_start_sending, NULL);
 			k_timer_start(&start_send_timer, K_MSEC(rand), K_MSEC(200));
 			
@@ -133,7 +116,7 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 		// ! printe mal hier
 		else if(pack.type == FLAG_NETWORK_SEND && pack.recvNodeID == packet.nodeID){
 			
-			if (own_turn) return;
+			//if (own_turn) return;
 			wait_for_advertiser();
 			struct packet own;
 			memcpy((void*)(&own),(void*)(&packet),sizeof(struct packet));
@@ -160,12 +143,11 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 
 int observer_start()
 {
-	//0x0004 = 2.5ms
 	struct bt_le_scan_param scan_param = {
 		.type       = BT_LE_SCAN_TYPE_PASSIVE,
 		.options    = BT_LE_SCAN_OPT_FILTER_DUPLICATE,
-		.interval   = 0x0004,
-		.window     = 0x0004,
+		.interval   = BT_GAP_SCAN_FAST_INTERVAL,
+		.window     = BT_GAP_SCAN_FAST_WINDOW,
 	};
 	int err;
 

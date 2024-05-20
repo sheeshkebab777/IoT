@@ -5,6 +5,12 @@
 
 static const uint16_t password = 53123;
 
+#define SINK_NODE_NOT_KNOWN -1
+#define NO_SINK_NODE 0
+#define YES_SINK_NODE 1
+
+int8_t SINK_NODE = YES_SINK_NODE;
+
 struct packet{
 	uint16_t password;
 	uint8_t type;
@@ -20,7 +26,7 @@ struct packet{
 struct packet packet  = {
 		.password = password,
 		.type = FLAG_NETWORK_START_SEND,
-		.nodeID = 3,
+		.nodeID = 1,
 		.recvNodeID = 0,
 		.counter = 0,
 		.temp = 0,

@@ -53,7 +53,7 @@ void init_packet(){
 		.humidity = 0,
 		.timestamp = 0,
 	};	
-	printk("Initialized with ID:%d\n",packet.nodeID);
+	
 }
 
 void reset_packet(){
@@ -71,6 +71,11 @@ int advertiser_stop(){
 		return err;
 	}
 	advertising = false;
+
+	if(SINK_NODE==YES_SINK_NODE){
+		packet.type = FLAG_NETWORK_SEND;
+	}
+
 	return 0;
 	
 }
@@ -113,8 +118,8 @@ int advertiser_restart(){
 
 void start_sending(){
 	if(!advertising){
-		advertiser_restart();
 		reset_packet();
+		advertiser_restart();
 		printk("Sending own, Counter: %d\n",packet.counter);
 	}
 }

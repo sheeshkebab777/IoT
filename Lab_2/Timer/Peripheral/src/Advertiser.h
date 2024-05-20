@@ -25,6 +25,7 @@ uint16_t ADV_DURATION = 150;
 
 
 
+
 /*tells if the node is currently advertising*/
 bool advertising = false;
 /*Adv Data*/
@@ -44,22 +45,21 @@ uint32_t get_ms(){
 void init_packet(){
 	packet = (struct packet){
 		.password = password,
-		.type = FLAG_NETWORK_FORM,
-		.nodeID = sys_rand32_get()%(UINT16_MAX - 1) + 1,
+		.type = FLAG_NETWORK_START_SEND,
+		.nodeID = packet.nodeID,
 		.recvNodeID = 0,
 		.counter = 0,
 		.temp = 0,
 		.humidity = 0,
 		.timestamp = 0,
-		.nodeCount = 3
 	};	
-	printk("Initialized with ID:%d\n",packet.nodeID);
+	
 }
 
 void reset_packet(){
 	packet.counter++;
-	packet.humidity = (float)(sys_rand32_get()%100);
-	packet.temp = (-25.0) + (float)(sys_rand32_get()%225); 
+	packet.humidity = (uint8_t)(sys_rand32_get()%100);
+	packet.temp = (-25.0) + (int16_t)(sys_rand32_get()%225); 
 	packet.timestamp = get_ms();
 }
 
@@ -67,6 +67,7 @@ int advertiser_stop(){
 	int err = bt_le_adv_stop();
 	if (err){
 		printk("Stop advertising failed (err %d)\n", err);
+		advertising = false;
 		return err;
 	}
 	advertising = false;
@@ -86,10 +87,12 @@ void timer_callback(struct k_timer *timer) {
 
 
 int advertiser_restart(){
-	
+	if (advertising) return 1;
+
 	int err = advertiser_stop();
-	if(err){
-		return err;	
+	if (err){
+		printk("Advertising failed to stop (err %d)\n", err);
+		return err;
 	}
 	/* Start advertising */
 	/*Advertise in interval (30,60) ms*/
@@ -109,9 +112,15 @@ int advertiser_restart(){
 }
 
 void start_sending(){
-	reset_packet();
-	printk("Sending own...\n");
-	advertiser_restart();
+	if(!advertising){
+		reset_packet();
+		advertiser_restart();
+		printk("Sending own, Counter: %d\n",packet.counter);
+	}
 }
 
+	
+void set_advertising(bool value){
+	
+}
 
