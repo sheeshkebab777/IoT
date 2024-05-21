@@ -10,7 +10,8 @@ static const uint16_t password = 53123;
 #define YES_SINK_NODE 1
 
 int8_t SINK_NODE = YES_SINK_NODE;
-
+bool ALREADY_PRESSED = false;
+uint16_t own_node_id = 1;
 struct packet{
 	uint16_t password;
 	uint8_t type;

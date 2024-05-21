@@ -16,22 +16,27 @@
 /*___________________________________________________________________*/
 /*_______________________________Main________________________________*/
 /*___________________________________________________________________*/
-void toggle_led(){
-	if(gpio_pin_get_dt(&led) > 0){
-		gpio_pin_set_dt(&led,1);
+void led_on(){
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (i == own_node_id - 1 || ALREADY_PRESSED){
+			gpio_pin_set_dt(&leds[i],1);
+		}
+		else{
+			gpio_pin_set_dt(&leds[i],0);
+		}
 	}
-	else{
-		gpio_pin_set_dt(&led,0);
-	}
+	
 	
 }
 
 void led_thread_function(void *arg1, void *arg2, void *arg3)
 {
+	uint16_t msec;
+	
     while (1) {
-        k_sleep(K_MSEC(400*packet.nodeID));
-		toggle_led();
-        
+		led_on();
+		k_sleep(K_MSEC(300));
     }
 }
 
@@ -76,7 +81,7 @@ static void bt_ready(int err)
 	
 
 }
-bool ALREADY_PRESSED = false;
+
 struct k_thread led_thread;
 K_THREAD_STACK_DEFINE(led_thread_stack, STACK_SIZE);
 int main(void)
@@ -92,6 +97,10 @@ int main(void)
 	err = button_ready();
 	if(err) { return 0;}
 	
+	leds[0] = led_1;
+	leds[1] = led_2;
+	leds[2] = led_3;
+	leds[3] = led_4;
 	/*init packet*/
 	init_packet();
 
@@ -113,13 +122,16 @@ int main(void)
 	while(1){
 
 		BUTTON_PRESSED = (gpio_pin_get_dt(&button) > 0);
-
 		if (BUTTON_PRESSED && SINK_NODE==YES_SINK_NODE && !ALREADY_PRESSED){
 			ALREADY_PRESSED = true;
 			k_timer_start(&init_timer, K_NO_WAIT, K_FOREVER);
+			k_sleep(K_FOREVER);
 			
 		}
-
+		//only for peripheral
+		if(sending_started){
+			k_sleep(K_FOREVER);
+		}
 		k_sleep(K_MSEC(300));
 			
 	}

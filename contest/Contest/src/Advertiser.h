@@ -57,6 +57,7 @@ void init_packet(){
 }
 
 void reset_packet(){
+	packet.nodeID = own_node_id;
 	packet.counter++;
 	packet.humidity = (uint8_t)(sys_rand32_get()%100);
 	packet.temp = (-25.0) + (int16_t)(sys_rand32_get()%225); 
@@ -93,12 +94,15 @@ void timer_callback(struct k_timer *timer) {
 
 int advertiser_restart(){
 	if (advertising) return 1;
-
-	int err = advertiser_stop();
-	if (err){
-		printk("Advertising failed to stop (err %d)\n", err);
-		return err;
+	int err;
+	if(SINK_NODE==NO_SINK_NODE){
+		err = advertiser_stop();
+		if (err){
+			printk("Advertising failed to stop (err %d)\n", err);
+			return err;
+		}
 	}
+	
 	/* Start advertising */
 	/*Advertise in interval (30,60) ms*/
 	

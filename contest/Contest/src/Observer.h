@@ -14,7 +14,7 @@
 /*______________________________________________________________________*/
 
 bool own_turn = true;
-
+bool sending_started = false;
 struct k_work start_send_worker;
 struct k_timer start_send_timer;
 
@@ -63,13 +63,10 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 
 	if(pack.password != password) return;
 	
-	if (SINK_NODE == SINK_NODE_NOT_KNOWN) {
-		SINK_NODE = NO_SINK_NODE;
-	}
 
-	if(SINK_NODE == YES_SINK_NODE){
+	if(SINK_NODE == YES_SINK_NODE && ALREADY_PRESSED){
 		//measurements received
-		if(pack.type == FLAG_NETWORK_SEND){
+		if(pack.type == FLAG_NETWORK_SEND && pack.recvNodeID == 1){
 			//<nodeiID>;<measurement-counter>;<temp>;<humidity>;<timestamp>;<tx-time>
 			printk("%d;%d;%d;%d;%d;%d\n",
 			pack.nodeID,
@@ -84,9 +81,9 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 
 	else if(SINK_NODE == NO_SINK_NODE){
 
-		
-		if(pack.type == FLAG_NETWORK_START_SEND){
+		if(pack.type == FLAG_NETWORK_START_SEND && !sending_started){
 			
+			sending_started = true;
 			if(packet.nodeID < 4){
 				//advertise for longer
 				uint16_t last_dur = ADV_DURATION;

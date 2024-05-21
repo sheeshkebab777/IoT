@@ -32,8 +32,19 @@ static const struct gpio_dt_spec button_change = GPIO_DT_SPEC_GET_OR(SW1_NODE, g
 
 static struct gpio_callback button_change_cb_data;
 
-static struct gpio_dt_spec led = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios,
+static struct gpio_dt_spec led_1 = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios,
 						     {0});
+
+static struct gpio_dt_spec led_2 = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led1), gpios,
+						     {0});
+
+static struct gpio_dt_spec led_3 = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led2), gpios,
+						     {0});
+
+static struct gpio_dt_spec led_4 = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led3), gpios,
+						     {0});
+
+static struct gpio_dt_spec leds [4];
 
 void button_pressed(const struct device *dev, struct gpio_callback *cb,
 		    uint32_t pins)
@@ -52,6 +63,9 @@ void button_pressed(const struct device *dev, struct gpio_callback *cb,
 		else{
 			SINK_NODE = NO_SINK_NODE;
 		}
+
+		own_node_id = packet.nodeID;
+
 	}
 	
 }
@@ -103,16 +117,52 @@ int button_ready(){
 	gpio_add_callback(button_change.port, &button_change_cb_data);
 	printk("Set up button at %s pin %d\n", button_change.port->name, button_change.pin);
 	
-		if (led.port) {
-		ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT);
+		if (led_1.port) {
+		ret = gpio_pin_configure_dt(&led_1, GPIO_OUTPUT);
 		if (ret != 0) {
 			printk("Error %d: failed to configure LED device %s pin %d\n",
-			       ret, led.port->name, led.pin);
+			       ret, led_1.port->name, led_1.pin);
 			return 1;
 		} else {
-			printk("Set up LED at %s pin %d\n", led.port->name, led.pin);
+			printk("Set up LED at %s pin %d\n", led_1.port->name, led_1.pin);
+			
+		}
+		}
+
+		if (led_2.port) {
+		ret = gpio_pin_configure_dt(&led_2, GPIO_OUTPUT);
+		if (ret != 0) {
+			printk("Error %d: failed to configure LED device %s pin %d\n",
+			       ret, led_2.port->name, led_2.pin);
+			return 1;
+		} else {
+			printk("Set up LED at %s pin %d\n", led_2.port->name, led_2.pin);
+			
+		}
+		}
+
+		if (led_3.port) {
+		ret = gpio_pin_configure_dt(&led_3, GPIO_OUTPUT);
+		if (ret != 0) {
+			printk("Error %d: failed to configure LED device %s pin %d\n",
+			       ret, led_3.port->name, led_3.pin);
+			return 1;
+		} else {
+			printk("Set up LED at %s pin %d\n", led_3.port->name, led_3.pin);
+			
+		}
+		}
+
+		if (led_4.port) {
+		ret = gpio_pin_configure_dt(&led_4, GPIO_OUTPUT);
+		if (ret != 0) {
+			printk("Error %d: failed to configure LED device %s pin %d\n",
+			       ret, led_4.port->name, led_4.pin);
+			return 1;
+		} else {
+			printk("Set up LED at %s pin %d\n", led_4.port->name, led_4.pin);
 			return 0;
 		}
-	}
+		}
 	return 1;
 }
