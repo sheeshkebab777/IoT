@@ -19,7 +19,7 @@
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
-uint16_t ADV_DURATION = 150;
+uint16_t ADV_DURATION = 60;
 
 
 
@@ -59,8 +59,8 @@ void init_packet(){
 void reset_packet(){
 	packet.nodeID = own_node_id;
 	packet.counter++;
-	packet.humidity = (uint8_t)(sys_rand32_get()%100);
-	packet.temp = (-25.0) + (int16_t)(sys_rand32_get()%225); 
+	packet.humidity = (uint16_t)(sys_rand32_get()%1000);
+	packet.temp = (-250) + (int16_t)(sys_rand32_get()%2250); 
 	packet.timestamp = get_ms();
 }
 
@@ -121,11 +121,11 @@ int advertiser_restart(){
 }
 
 void start_sending(){
-	if(!advertising){
+		wait_for_advertiser();
 		reset_packet();
 		advertiser_restart();
 		printk("Sending own, Counter: %d\n",packet.counter);
-	}
+	
 }
 
 	
