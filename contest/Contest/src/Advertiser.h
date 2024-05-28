@@ -27,7 +27,7 @@ uint16_t ADV_DURATION = 150;
 
 
 /*tells if the node is currently advertising*/
-bool advertising = false;
+volatile bool advertising = false;
 /*Adv Data*/
 /* Send status of the LED Data */
 static struct bt_data ad[] = {

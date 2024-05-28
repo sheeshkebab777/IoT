@@ -32,7 +32,6 @@ void led_on(){
 
 void led_thread_function(void *arg1, void *arg2, void *arg3)
 {
-	uint16_t msec;
 	
     while (1) {
 		led_on();
@@ -40,8 +39,27 @@ void led_thread_function(void *arg1, void *arg2, void *arg3)
     }
 }
 
+
+
 struct k_work init_worker;
 struct k_timer init_timer;
+struct k_work own_measurment;
+struct k_timer own_measurment_timer;
+
+void own_measurment_handler(struct k_work * work){
+	reset_packet();
+		printk("%d;%d;%d;%d;%d;%d\n",
+	packet.nodeID,
+	packet.counter,
+	packet.temp,
+	packet.humidity,
+	packet.timestamp,
+	0);
+}
+
+void own_measurment_callback(struct k_work * work){
+	k_work_submit(&own_measurment);
+}
 
 void init_handler(struct k_work *work) {
     
@@ -109,6 +127,9 @@ int main(void)
 	
 	k_work_init(&init_worker,init_handler);
 	k_timer_init(&init_timer,init_callback,NULL);
+
+	k_work_init(&own_measurment,own_measurment_handler);
+	k_timer_init(&own_measurment_timer,own_measurment_callback,NULL);
 	/*led thread*/
 	k_tid_t led_thread_tid = k_thread_create(&led_thread, led_thread_stack,
                                             K_THREAD_STACK_SIZEOF(led_thread_stack),
@@ -125,6 +146,7 @@ int main(void)
 		if (BUTTON_PRESSED && SINK_NODE==YES_SINK_NODE && !ALREADY_PRESSED){
 			ALREADY_PRESSED = true;
 			k_timer_start(&init_timer, K_NO_WAIT, K_FOREVER);
+			k_timer_start(&own_measurment_timer,K_NO_WAIT,K_MSEC(200));
 			k_sleep(K_FOREVER);
 			
 		}
