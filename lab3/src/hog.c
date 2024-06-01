@@ -295,7 +295,6 @@ void button_manage_Y(void * arg1,void *  arg2,void * arg3)
 			}
 		}
 		
-
 		switch (presses_y)
 		{
 		case 0:
@@ -378,6 +377,52 @@ void right_button_manage(void * arg1, void * arg2, void * arg3){
 		k_sleep(K_MSEC(25));
 	}
 }
+/*doesnt run, since all buttons reserved*/
+void start_shortcut(void * arg1, void * arg2, void * arg3){
+	while (true){
+		if(gpio_pin_get_dt(&button_right)){
+			//go to the left bottom of the screen on windows
+			for (size_t i = 0; i < 10; i++)
+			{
+				report[1] = -127;
+				report[2] = 127;
+				bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+			}
+			memset(report,0,3*sizeof(int8_t));
+			//click on windows emblem
+			report[0] |= 1;
+
+			bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+
+			memset(report,0,3*sizeof(int8_t));
+
+			//move to the right to hover over the programm
+			for (size_t i = 0; i < 3; i++)
+			{
+				report[1] = 127;
+				report[2] = -127;
+				bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+			}
+
+			memset(report,0,3*sizeof(int8_t));
+
+
+			//click on the programm (on my computer single click)
+			report[0] |= 1;
+
+			bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+
+			memset(report,0,3*sizeof(int8_t));
+
+
+			
+		}
+	}
+}
 
 
 void hog_init(void)
@@ -425,6 +470,6 @@ void hog_button_loop(void)
 		* Byte 1: X axis (int8)
 		* Byte 2: Y axis (int8)
 		*/
-	k_sleep(K_MSEC(100));
+	k_sleep(K_MSEC(K_FOREVER));
 	}
 }
