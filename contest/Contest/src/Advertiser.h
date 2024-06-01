@@ -19,7 +19,7 @@
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
-uint16_t ADV_DURATION = 60;
+uint16_t ADV_DURATION = 150;
 
 
 

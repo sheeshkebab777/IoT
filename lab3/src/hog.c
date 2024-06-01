@@ -187,6 +187,10 @@ struct k_thread X_thread;
 K_THREAD_STACK_DEFINE(X_thread_stack, STACK_SIZE);
 struct k_thread Y_thread;
 K_THREAD_STACK_DEFINE(Y_thread_stack, STACK_SIZE);
+struct k_thread left_thread;
+K_THREAD_STACK_DEFINE(left_thread_stack, STACK_SIZE);
+struct k_thread right_thread;
+K_THREAD_STACK_DEFINE(right_thread_stack, STACK_SIZE);
 
 #define SW0_NODE	DT_ALIAS(sw0)
 #if !DT_NODE_HAS_STATUS(SW0_NODE, okay)
@@ -202,18 +206,68 @@ static const struct gpio_dt_spec button_X = GPIO_DT_SPEC_GET_OR(SW0_NODE, gpios,
 static const struct gpio_dt_spec button_Y = GPIO_DT_SPEC_GET_OR(SW1_NODE, gpios,
 							      {0});
 
-static int8_t report[3] = {0, 0, 0};
+#define SW2_NODE	DT_ALIAS(sw2)
+#if !DT_NODE_HAS_STATUS(SW2_NODE, okay)
+#error "Unsupported board: sw2 devicetree alias is not defined"
+#endif
+static const struct gpio_dt_spec button_left = GPIO_DT_SPEC_GET_OR(SW2_NODE, gpios,
+							      {0});							  
 
+#define SW3_NODE	DT_ALIAS(sw3)
+#if !DT_NODE_HAS_STATUS(SW3_NODE, okay)
+#error "Unsupported board: sw3 devicetree alias is not defined"
+#endif
+static const struct gpio_dt_spec button_right = GPIO_DT_SPEC_GET_OR(SW3_NODE, gpios,
+							      {0});
+
+uint32_t get_ms(){
+	return (((sys_clock_cycle_get_32())*1000)/32768);
+}
+
+static int8_t report[3] = {0, 0, 0};
+uint8_t presses_x = 0;
+uint8_t presses_y = 0;
 void button_manage_X(void * arg1,void *  arg2,void * arg3)
 {
 	while (true){
-		if (gpio_pin_get_dt(&button_X)){
-		report[1] = 5;
+		if(!gpio_pin_get_dt(&button_X)){
+			presses_x = 0;
 		}
+		if(gpio_pin_get_dt(&button_X) && presses_x == 0){
+			presses_x = 1;
+			uint32_t start_ms = get_ms();
+			bool pressed = true;
+			while(get_ms() - start_ms < 500){
+				if (!gpio_pin_get_dt(&button_X)){
+					pressed = false;
+				}
+				if (!pressed && gpio_pin_get_dt(&button_X)){
+					presses_x = 2;
+					break;
+				}
+
+			}
+		}
+
+		switch (presses_x)
+		{
+		case 0:
+			report[1] = 0;
+			break;
+		
+		case 1:
+			report[1] = 5;
+			break;
+		
+		case 2:
+			report[1] = -5;
+			break;
+		}
+
 		bt_gatt_notify(NULL, &hog_svc.attrs[5],
-					report, sizeof(report));
+						report, sizeof(report));
 		memset(report,0,3*sizeof(int8_t));
-		k_sleep(K_MSEC(100));
+		k_sleep(K_MSEC(25));
 	}
 	
 
@@ -221,49 +275,156 @@ void button_manage_X(void * arg1,void *  arg2,void * arg3)
 
 void button_manage_Y(void * arg1,void *  arg2,void * arg3)
 {	
-	while (true){
-		if (gpio_pin_get_dt(&button_Y)){
-			report[2] = 5;
-			printk("moin\n");
+		while (true){
+		if(!gpio_pin_get_dt(&button_Y)){
+			presses_y = 0;
 		}
+		if(gpio_pin_get_dt(&button_Y) && presses_y == 0){
+			presses_y = 1;
+			uint32_t start_ms = get_ms();
+			bool pressed = true;
+			while(get_ms() - start_ms < 500){
+				if (!gpio_pin_get_dt(&button_Y)){
+					pressed = false;
+				}
+				if (!pressed && gpio_pin_get_dt(&button_Y)){
+					presses_y = 2;
+					break;
+				}
+
+			}
+		}
+		
+
+		switch (presses_y)
+		{
+		case 0:
+			report[2] = 0;
+			break;
+		
+		case 1:
+			report[2] = -5;
+			break;
+		
+		case 2:
+			report[2] = 5;
+			break;
+		}
+
 		bt_gatt_notify(NULL, &hog_svc.attrs[5],
-					report, sizeof(report));
+						report, sizeof(report));
 		memset(report,0,3*sizeof(int8_t));
-		k_sleep(K_MSEC(100));
+		k_sleep(K_MSEC(10));
+	}
+}
+
+void left_button_manage(void * arg1, void * arg2, void * arg3){
+	while (true){
+
+		if(gpio_pin_get_dt(&button_left)){
+			report[0] |= 1;
+
+			bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+
+			uint32_t start_ms = get_ms();
+			bool pressed = true;
+			while(get_ms() - start_ms < 500){
+				if (!gpio_pin_get_dt(&button_left)){
+					pressed = false;
+				}
+				if (!pressed && gpio_pin_get_dt(&button_left)){
+					bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+					break;
+				}
+
+			}
+		}
+		memset(report,0,3*sizeof(int8_t));
+		bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+		
+		k_sleep(K_MSEC(25));
+	}
+}
+
+void right_button_manage(void * arg1, void * arg2, void * arg3){
+	while (true){
+
+		if(gpio_pin_get_dt(&button_right)){
+			report[0] |= 2;
+
+			bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+
+			uint32_t start_ms = get_ms();
+			bool pressed = true;
+			while(get_ms() - start_ms < 500){
+				if (!gpio_pin_get_dt(&button_right)){
+					pressed = false;
+				}
+				if (!pressed && gpio_pin_get_dt(&button_right)){
+					bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+					break;
+				}
+
+			}
+		}
+		memset(report,0,3*sizeof(int8_t));
+		bt_gatt_notify(NULL, &hog_svc.attrs[5],
+						report, sizeof(report));
+		k_sleep(K_MSEC(25));
 	}
 }
 
 
 void hog_init(void)
 {
+	
 	gpio_pin_configure_dt(&button_X, GPIO_INPUT);
 	printk("Set up button at %s pin %d\n", button_X.port->name, button_X.pin);
 
 	gpio_pin_configure_dt(&button_Y, GPIO_INPUT);
 	printk("Set up button at %s pin %d\n", button_Y.port->name, button_Y.pin);
 
-	/*
-	k_tid_t X_thread_tid = k_thread_create(&X_thread, X_thread_stack,
-                                            K_THREAD_STACK_SIZEOF(X_thread_stack),
-                                            button_manage_X, NULL, NULL, NULL,
-                                            THREAD_PRIORITY, 0, K_NO_WAIT);
+	gpio_pin_configure_dt(&button_left, GPIO_INPUT);
+	printk("Set up button at %s pin %d\n", button_left.port->name, button_left.pin);
 
-	k_tid_t Y_thread_tid = k_thread_create(&Y_thread, Y_thread_stack,
-                                            K_THREAD_STACK_SIZEOF(Y_thread_stack),
-                                            button_manage_Y, NULL, NULL, NULL,
-                                            THREAD_PRIORITY, 0, K_NO_WAIT);*/
+	gpio_pin_configure_dt(&button_right, GPIO_INPUT);
+	printk("Set up button at %s pin %d\n", button_right.port->name, button_right.pin);
+	
+	k_thread_create(&X_thread, X_thread_stack,
+					K_THREAD_STACK_SIZEOF(X_thread_stack),
+					button_manage_X, NULL, NULL, NULL,
+					THREAD_PRIORITY, 0, K_NO_WAIT);
+
+	k_thread_create(&Y_thread, Y_thread_stack,
+					K_THREAD_STACK_SIZEOF(Y_thread_stack),
+					button_manage_Y, NULL, NULL, NULL,
+					THREAD_PRIORITY, 0, K_NO_WAIT);
+	
+	k_thread_create(&left_thread, left_thread_stack,
+					K_THREAD_STACK_SIZEOF(left_thread_stack),
+					left_button_manage, NULL, NULL, NULL,
+					THREAD_PRIORITY, 0, K_NO_WAIT);
+
+	k_thread_create(&right_thread, right_thread_stack,
+					K_THREAD_STACK_SIZEOF(right_thread_stack),
+					right_button_manage, NULL, NULL, NULL,
+					THREAD_PRIORITY, 0, K_NO_WAIT);
 }
 
 void hog_button_loop(void)
 {
 
-	
 	for (;;) {
 	/* HID Report:
 		* Byte 0: buttons (lower 3 bits)
 		* Byte 1: X axis (int8)
 		* Byte 2: Y axis (int8)
 		*/
-	k_sleep(K_FOREVER);
+	k_sleep(K_MSEC(100));
 	}
 }

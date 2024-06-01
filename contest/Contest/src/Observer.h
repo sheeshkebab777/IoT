@@ -103,9 +103,8 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 			printk("Start sending...\n");
 			k_work_init(&start_send_worker, start_sending_handler);
 
-			uint32_t rand = 500 + sys_rand32_get()%(500);
 			k_timer_init(&start_send_timer, callback_start_sending, NULL);
-			k_timer_start(&start_send_timer, K_MSEC(rand), K_MSEC(200));
+			k_timer_start(&start_send_timer, K_NO_WAIT, K_MSEC(200));
 			
 			
 		}
@@ -120,12 +119,14 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 			memcpy((void*)(&packet),(void*)(&pack),sizeof(struct packet));
 			packet.recvNodeID = own.recvNodeID;
 
-			if(advertiser_restart() == 0){
+			if(advertiser_restart() == 1){
 				//printk("Forwarding ID: %d...\n",pack.nodeID);
 				
 				//wait for advertising to stop
 				wait_for_advertiser();
+				advertiser_restart();
 			}
+			printk("Forwarding ID:%d\n",pack.nodeID);
 			
 			
 

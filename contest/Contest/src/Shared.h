@@ -19,7 +19,7 @@ struct packet{
 	uint16_t recvNodeID;
 	uint32_t counter;
 	int16_t temp;
-	uint8_t humidity;
+	uint16_t humidity;
 	uint32_t timestamp;
 };
 

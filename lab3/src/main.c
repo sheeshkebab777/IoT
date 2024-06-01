@@ -27,6 +27,8 @@
 
 #include "hog.h"
 
+#define CONFIG_SAMPLE_BT_USE_AUTHENTICATION 0
+
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
