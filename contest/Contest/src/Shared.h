@@ -19,7 +19,9 @@ struct packet{
 	uint16_t recvNodeID;
 	uint32_t counter;
 	int16_t temp;
+	uint8_t temp_dec;
 	uint16_t humidity;
+	uint8_t humidity_dec;
 	uint32_t timestamp;
 };
 
@@ -31,7 +33,9 @@ struct packet packet  = {
 		.recvNodeID = 0,
 		.counter = 0,
 		.temp = 0,
+		.temp_dec = 0,
 		.humidity = 0,
+		.humidity_dec = 0,
 		.timestamp = 0,
 	};
 

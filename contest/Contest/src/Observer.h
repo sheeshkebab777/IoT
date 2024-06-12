@@ -20,6 +20,7 @@ struct k_timer start_send_timer;
 
 void wait_for_advertiser(){
 	//wait for advertising to stop
+	return;
 	while(advertising){
 		k_sleep(K_MSEC(50));
 	}
@@ -68,11 +69,13 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 		//measurements received
 		if(pack.type == FLAG_NETWORK_SEND && pack.recvNodeID == 1){
 			//<nodeiID>;<measurement-counter>;<temp>;<humidity>;<timestamp>;<tx-time>
-			printk("%d;%d;%d;%d;%d;%d\n",
-			pack.nodeID,
+			printk("%d;%d;%d.%d;%d.%d;%d;%d\n",
+			pack.nodeID + 1,
 			pack.counter,
 			pack.temp,
+			pack.temp_dec,
 			pack.humidity,
+			pack.humidity_dec,
 			pack.timestamp,
 			((((sys_clock_cycle_get_32())*1000)/32768) - pack.timestamp));
 			return;
@@ -104,7 +107,7 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 			k_work_init(&start_send_worker, start_sending_handler);
 
 			k_timer_init(&start_send_timer, callback_start_sending, NULL);
-			k_timer_start(&start_send_timer, K_NO_WAIT, K_MSEC(200));
+			k_timer_start(&start_send_timer, K_NO_WAIT, K_MSEC(200 + own_node_id*25));
 			
 			
 		}
@@ -118,6 +121,7 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 			memcpy((void*)(&own),(void*)(&packet),sizeof(struct packet));
 			memcpy((void*)(&packet),(void*)(&pack),sizeof(struct packet));
 			packet.recvNodeID = own.recvNodeID;
+			packet.nodeID+=own_node_id;
 
 			if(advertiser_restart() == 1){
 				//printk("Forwarding ID: %d...\n",pack.nodeID);

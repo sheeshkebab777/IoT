@@ -1,0 +1,7 @@
+&gpio0 {
+	onewire0: onewire@0 {
+		compatible = "ds18b20";
+		label = "OW0";
+		gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;  // Adjust the GPIO pin as needed
+	};
+};

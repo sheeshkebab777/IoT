@@ -48,11 +48,13 @@ struct k_timer own_measurment_timer;
 
 void own_measurment_handler(struct k_work * work){
 	reset_packet();
-		printk("%d;%d;%d;%d;%d;%d\n",
+		printk("%d;%d;%d.%d;%d.%d;%d;%d\n",
 	packet.nodeID,
 	packet.counter,
 	packet.temp,
+	packet.temp_dec,
 	packet.humidity,
+	packet.humidity_dec,
 	packet.timestamp,
 	0);
 }

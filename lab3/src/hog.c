@@ -470,6 +470,6 @@ void hog_button_loop(void)
 		* Byte 1: X axis (int8)
 		* Byte 2: Y axis (int8)
 		*/
-	k_sleep(K_MSEC(K_FOREVER));
+	k_sleep(K_FOREVER);
 	}
 }

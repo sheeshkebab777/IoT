@@ -50,7 +50,9 @@ void init_packet(){
 		.recvNodeID = 0,
 		.counter = 0,
 		.temp = 0,
+		.temp_dec = 0,
 		.humidity = 0,
+		.humidity_dec = 0,
 		.timestamp = 0,
 	};	
 	
@@ -59,8 +61,10 @@ void init_packet(){
 void reset_packet(){
 	packet.nodeID = own_node_id;
 	packet.counter++;
-	packet.humidity = (uint16_t)(sys_rand32_get()%1000);
-	packet.temp = (-250) + (int16_t)(sys_rand32_get()%2250); 
+	packet.humidity = (uint16_t)(sys_rand32_get()%100);
+	packet.humidity_dec =(uint8_t)(sys_rand32_get()%10);
+	packet.temp = (-25) + (int16_t)(sys_rand32_get()%225);
+	packet.temp_dec = (uint8_t)(sys_rand32_get()%10);
 	packet.timestamp = get_ms();
 }
 
