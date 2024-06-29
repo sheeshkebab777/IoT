@@ -1,7 +1,7 @@
-#include <kernel.h>
-#include <device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 #include <inttypes.h>
-#include <random/rand32.h>
+#include <zephyr/random/rand32.h>
 
 #ifndef ADVERTISER
 #define ADVERTISER
@@ -55,6 +55,9 @@ int main(void)
 	
 	k_work_init(&advertiser_worker,stop_ble_handler);
 	k_timer_init(&advertiser_timer,timer_callback,NULL);
+
+	k_work_init(&advertiser_start_work,advertiser_start_worker);
+	k_work_init(&run_cooker_work,cook_till);
 	
 	/*advertising, scanning loop*/
 	while(true){

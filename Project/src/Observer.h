@@ -1,10 +1,8 @@
-#include <zephyr.h>
-
-#include <sys/printk.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <drivers/sensor.h>
-#include <drivers/gpio.h>
+#include <zephyr/sys/printk.h>
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/hci.h>
+#include <zephyr/drivers/sensor.h>
+#include <zephyr/drivers/gpio.h>
 
 
 #ifndef SHARED
@@ -29,30 +27,36 @@ static bool data_cb(struct bt_data *data, void *user_data)
 }
 
 volatile static bool cook = false;
+volatile static double celsius = 0.0;
 
-static void cook_till(uint8_t celsius){
+void cook_till(struct k_work *work){
 	cook = true;
 	int ret;
+	// ! turn on gpio pin
+	gpio_pin_set(power_supply,POWER_SUPPLY_PIN_NUMBER,1);
+	
 	while(cook){
-		ret = sensor_sample_fetch(dev);
+		k_sleep(K_MSEC(100));
+		
+		ret = sensor_sample_fetch(temp_dev);
 		if (ret) {
 			printk("Failed to fetch sample: %d\n", ret);
 		}
 		struct sensor_value temp;
-		ret = sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP, &temp);
+		ret = sensor_channel_get(temp_dev, SENSOR_CHAN_AMBIENT_TEMP, &temp);
 		if (ret) {
 			printk("Failed to get channel: %d\n", ret);
 		}
+		double cel = sensor_value_to_double(&temp);
 
-		if(temp.val1 >= celsius){
+		if(cel >= celsius){
 			cook = false;
-			//turn off gpio pin
 		}
 		printk("Temp: %d.%06d\n", temp.val1, temp.val2);
-		k_sleep(K_SECONDS(2));
-
+		
 	}
-
+	// ! turn off gpio pin
+	gpio_pin_set(power_supply,POWER_SUPPLY_PIN_NUMBER,0);
 	printk("Turned off cooking...\n");
 }
 
@@ -62,11 +66,14 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 {	
 	struct packet pack;
 	bt_data_parse(ad,data_cb,&pack);
-
+	
 	if(pack.password != password) return;
-
+	already_set = true;
+	printk("hallo\n");
 	//receiver
 	if(!sender){
+		
+
 		switch(pack.type){
 			case TURN_OFF_T: {
 				printk("Turning kettle off...\n");
@@ -74,13 +81,24 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 				break;
 			}
 			case BLACK_TEA_T:{
+				celsius = 100.0;
+				if(cook){
+					printk("Already cooking...\n");
+					break;
+				}
 				printk("Cooking until black tea temperature is reached...\n");
-				cook_till(100);
+				k_work_submit(&run_cooker_work);
+				printk("moinn\n");
 				break;
 			}
 			case GREEN_TEA_T:{
+				celsius = 80.0;
+				if(cook){
+					printk("Already cooking...\n");
+					break;
+				}
 				printk("Cooking until green tea temperature is reached...\n");
-				cook_till(80);
+				k_work_submit(&run_cooker_work);
 				break;
 			}
 			default:{

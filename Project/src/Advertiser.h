@@ -1,13 +1,11 @@
-#include <zephyr.h>
-
 #include <zephyr/types.h>
 #include <stddef.h>
-#include <sys/printk.h>
-#include <sys/util.h>
+#include <zephyr/sys/printk.h>
+#include <zephyr/sys/util.h>
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <random/rand32.h>
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/hci.h>
+#include <zephyr/random/rand32.h>
 
 #ifndef SHARED
 #define SHARED
@@ -37,6 +35,7 @@ uint32_t get_ms(){
 }
 
 int advertiser_stop(){
+	if (!advertising){return 0;}
 	int err = bt_le_adv_stop();
 	advertising = false;
 	if (err){
@@ -47,8 +46,12 @@ int advertiser_stop(){
 	
 }
 
+void advertiser_start_worker(struct k_work *work){
+	advertiser_start();
+}
 
 int advertiser_start(){
+	already_set = true;
 	/* Start advertising */
 	/*Advertise in interval (30,60) ms*/
 	int err = advertiser_stop();
@@ -56,7 +59,7 @@ int advertiser_start(){
 		printk("Stop advertising failed (err %d)\n", err);
 		return err;
 	}
-
+	
 	err  = bt_le_adv_start(BT_LE_ADV_PARAM(0, BT_GAP_ADV_FAST_INT_MIN_1,
 					BT_GAP_ADV_FAST_INT_MAX_2, NULL),
 					ad, ARRAY_SIZE(ad), NULL, 0);
@@ -64,10 +67,11 @@ int advertiser_start(){
 		printk("Advertising failed to start (err %d)\n", err);
 		return err;
 	}
-
+	
 	advertising = true;
+	
 	k_timer_start(&advertiser_timer,K_MSEC(ADV_DURATION),K_FOREVER);
-
+	
 
 	return 0;
 }
